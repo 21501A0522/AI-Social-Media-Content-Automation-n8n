@@ -1,0 +1,214 @@
+{
+  "name": "AI Powered Social Media Content Automation Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1qdLAWPM3kEvqd2pcpaRiM1oNbkT1h9hF2vKC__iE_tE",
+          "mode": "list",
+          "cachedResultName": "Social Media Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qdLAWPM3kEvqd2pcpaRiM1oNbkT1h9hF2vKC__iE_tE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qdLAWPM3kEvqd2pcpaRiM1oNbkT1h9hF2vKC__iE_tE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        64
+      ],
+      "id": "ca4a4f96-948c-4e88-9a23-720f7a28f3c7",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "TpdGEqBNBpztM8CW",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Summarize this article: {{ $json.ArticleLinks}}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        256,
+        64
+      ],
+      "id": "e524db8c-ede9-4e2c-9a26-208abe993852",
+      "name": "Summarize Articles"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        224
+      ],
+      "id": "b6610a2c-ff15-418a-9d38-410cfae33506",
+      "name": "OpenAI Model - Article Summarizer",
+      "credentials": {
+        "openAiApi": {
+          "id": "K7CsuixakmRj0y3I",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        224
+      ],
+      "id": "87d7f170-353a-498f-a3b9-24d809bd175c",
+      "name": "OpenAI Model - Article Summarizer1",
+      "credentials": {
+        "openAiApi": {
+          "id": "K7CsuixakmRj0y3I",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Draft an X post as an AI industry expert analyzing a key news article. The post should:\n    Deliver sharp insights on the article's main points.\n    Connect to current AI trends.\n    Spark discussion with a thought-provoking question.\n    Keep it punchy and engaging.\n    End with a clear CTA.\n    Length should be within 30 words. Focus on what matters most to the AI community. Make every word count.\n    Article summary: {{ $json.text }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        608,
+        64
+      ],
+      "id": "d008ff7f-a040-4f3d-b9fc-bd538fcab278",
+      "name": "OpenAI Model - X Summarizer"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        960,
+        64
+      ],
+      "id": "6c146f54-398a-462d-87fc-8eda5e3c1122",
+      "name": "Post to X (Twitter)",
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "F9ZfEPuI7ynY5ctg",
+          "name": "X account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Summarize Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Article Summarizer": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarize Articles",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Articles": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Model - X Summarizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - Article Summarizer1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "OpenAI Model - X Summarizer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model - X Summarizer": {
+      "main": [
+        [
+          {
+            "node": "Post to X (Twitter)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6a9bf603-f0d8-48e5-9a62-af3efdc0a4ac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2edad65e8ec6c08e4c41eac52489e0fc2a196dd3b78edc09f11a2d8e58330ca5"
+  },
+  "id": "w7CDRJqJI6BqZTwR",
+  "tags": []
+}
